@@ -1,35 +1,53 @@
 #include "cityModel.h"
 
+#include <cmath>
+
 #include "utils/utils.h"
 
-CityModel::CityModel(QGraphicsItem *parent)
-    : QGraphicsItem(parent), name("CityModel")
+CityModel::CityModel(QGraphicsItem *parent = nullptr)
+    : QGraphicsItem(parent), value(0)
 {
-    update();
+    // setFlag(QGraphicsItem::ItemIsMovable);
+    setFlag(QGraphicsItem::ItemIsFocusable);
+    setFlag(QGraphicsItem::ItemIsSelectable);
 }
 
-CityModel::CityModel(QString name, double radius, QGraphicsItem *parent)
-    : QGraphicsItem(parent), name(name), radius(radius)
+CityModel::CityModel(
+    int value,
+    CityModel *tree_parent,
+    CityModel *tree_left,
+    CityModel *tree_right,
+    double radius,
+    QGraphicsItem *parent)
+    : QGraphicsItem(parent),
+      value(value),
+      tree_parent(tree_parent),
+      tree_left(tree_left),
+      tree_right(tree_right),
+      radius(radius)
 {
-    update();
+    // setFlag(QGraphicsItem::ItemIsMovable);
+    setFlag(QGraphicsItem::ItemIsFocusable);
+    setFlag(QGraphicsItem::ItemIsSelectable);
 }
 
-CityModel::CityModel(const CityModel &c)
-    : QGraphicsItem(c.parentItem()), name(c.name), radius(c.radius)
+CityModel::CityModel(const CityModel &city)
+    : QGraphicsItem(city.parentItem()),
+      value(city.value),
+      tree_parent(city.tree_parent),
+      tree_left(city.tree_left),
+      tree_right(city.tree_right),
+      radius(city.radius)
+
 {
-    update();
+    // setFlag(QGraphicsItem::ItemIsMovable);
+    setFlag(QGraphicsItem::ItemIsFocusable);
+    setFlag(QGraphicsItem::ItemIsSelectable);
 }
 
 bool operator==(const CityModel &c1, const CityModel &c2)
 {
-    return c1.name == c2.name;
-}
-
-void CityModel::update()
-{
-    setFlag(QGraphicsItem::ItemIsMovable);
-    setFlag(QGraphicsItem::ItemIsFocusable);
-    setFlag(QGraphicsItem::ItemIsSelectable);
+    return c1.value == c2.value;
 }
 
 void CityModel::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
@@ -39,47 +57,59 @@ void CityModel::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidg
 
     painter->drawEllipse(boundingRect());
 
-    { // name
-        QFontMetrics fm(painter->font());
-        const int tw = fm.width(name),
-                  th = fm.height();
-        painter->drawText(radius - tw / 2, radius - th / 4, name);
+    if (tree_parent == nullptr)
+    {
+        painter->drawText(0, 0, "0,0");
+        painter->drawText(100, 0, "100,0");
+        painter->drawText(0, 100, "0,100");
+        painter->drawText(100, 100, "100,100");
+        painter->drawText(-100, -100, "-100,-100");
     }
+    qreal x0 = pos().x(), y0 = pos().y(), x1 = x0 + radius * 2, y1 = y0 + radius * 2;
+    {
+        std::ofstream f("AV.txt");
+        f << x0 << '\n'
+          << y0 << '\n'
+          << x1 << '\n'
+          << y1;
+        painter->drawText(x0, y0, QString::fromStdString(std::to_string((int)x0) + "," + std::to_string((int)y0)));
+        painter->drawText(x1, y0, QString::fromStdString(std::to_string((int)x1) + "," + std::to_string((int)y0)));
+        painter->drawText(x0, y1, QString::fromStdString(std::to_string((int)x0) + "," + std::to_string((int)y1)));
+        painter->drawText(x1, y1, QString::fromStdString(std::to_string((int)x1) + "," + std::to_string((int)y1)));
+        f.close();
+    }
+    QFontMetrics fm(painter->font());
+    const QString v = double2QString(value);
+    const int tw = fm.width(v),
+              th = fm.height();
+    painter->drawText(x0 + radius - tw / 2, y0 + radius - th / 4, v);
 
-    if (mark_DXTR < INF)
-    { // DXTR
-        QFontMetrics fm(painter->font());
-        QString v = double2QString(mark_DXTR);
-        const int tw = fm.width(v),
-                  th = fm.height();
-        painter->drawText(radius - tw / 2, radius + th, v);
-    }
+    if (tree_left != nullptr)
+        painter->drawLine(x0 + radius, y0 + radius * 2, tree_left->pos().x() + radius, tree_left->pos().y());
+
+    if (tree_right != nullptr)
+        painter->drawLine(x0 + radius, y0 + radius * 2, tree_right->pos().x() + radius, tree_right->pos().y());
 }
 QRectF CityModel::boundingRect() const
 {
-    return QRectF(0, 0, radius * 2, radius * 2);
+    return QRectF(pos().x(), pos().y(), radius * 2, radius * 2);
 }
 
-std::fstream &operator<<(std::fstream &fout, const CityModel &city)
+void CityModel::repos(int length)
 {
-    fout << city.name.toStdString() << DLTR
-         << city.pos().x() << DLTR
-         << city.pos().y() << DLTR
-         << city.radius << DLTR;
-    return fout;
-}
+    if (tree_parent != nullptr && tree_parent->tree_left == this)
+        setPos(
+            tree_parent->pos().x() + radius - ((50 * (pow(2, length) - 1)) / 2 + radius),
+            tree_parent->pos().y() + radius + radius * 4);
+    else if (tree_parent != nullptr && tree_parent->tree_right == this)
+        setPos(
+            tree_parent->pos().x() + radius + ((50 * (pow(2, length) - 1)) / 2 + radius),
+            tree_parent->pos().y() + radius + radius * 4);
+    else
+        setPos(0, 0);
 
-std::fstream &operator>>(std::fstream &fin, CityModel &city)
-{
-    std::string name_raw, x_raw, y_raw, radius_raw;
-    std::getline(fin, name_raw, DLTR);
-    std::getline(fin, x_raw, DLTR);
-    std::getline(fin, y_raw, DLTR);
-    std::getline(fin, radius_raw, DLTR);
-
-    city.name = QString::fromStdString(name_raw);
-    city.moveBy(stod(x_raw), stod(y_raw));
-    city.radius = stod(radius_raw);
-
-    return fin;
+    if (tree_left != nullptr)
+        tree_left->repos(length - 1);
+    if (tree_right != nullptr)
+        tree_right->repos(length - 1);
 }

@@ -15,8 +15,8 @@ public:
     explicit AddCityDialog(QWidget *parent = nullptr);
     ~AddCityDialog();
 
-    QString city_name;
-    bool cancel = false;
+    int value;
+    bool cancel = true;
 
 private slots:
     void on_pushButton_ok_clicked();

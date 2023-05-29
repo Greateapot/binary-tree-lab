@@ -12,12 +12,9 @@ class Scene : public QGraphicsScene
 public:
     explicit Scene(QObject *parent = nullptr);
 
-    bool choosing_cities = 0;
-
     void update_selected();
 
 signals:
-    void city_chosen(CityModel *);
     void item_selected(QGraphicsItem *);
 
 protected:

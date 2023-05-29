@@ -8,11 +8,11 @@
 #include <QDoubleValidator>
 
 #include "model/city/cityModel.h"
-#include "model/road/roadModel.h"
 #include "widget/scene/scene.h"
 
 const char GDLTR = '\1';
 const int STATUS_MESSAGE_DELAY = 5000;
+
 namespace Ui
 {
     class MainWindow;
@@ -28,8 +28,9 @@ public:
 
 private slots:
     void addCity();
-    void addRoad();
-    void _addRoad(CityModel *);
+    void removeCity();
+
+    void showSolution();
 
     void unselectAll();
     void select(QGraphicsItem *);
@@ -37,37 +38,37 @@ private slots:
     void unvisitAll();
     void visit(CityModel *);
 
-    void save();
-    void load();
-
-    void build_matrix(std::vector<std::vector<double>> &);
-    void reduce_matrix(std::vector<std::vector<double>> &);
-
-    void step(std::vector<std::pair<int, int>> &, std::vector<std::vector<double>> &);
-
-    void showSolution();
-
-    void solve_width(size_t);
-
-    void solve_depth(size_t);
-    void _solve_depth(CityModel *, QString, size_t);
-
-    void solve_DXTR(size_t);
-    void _solve_DXTR(CityModel *);
-
-    void solve_TSP(size_t);
-
-protected:
-    void keyPressEvent(QKeyEvent *);
+    // void save();
+    // void load();
 
 private:
     Ui::MainWindow *ui;
     Scene *scene;
 
-    std::vector<CityModel *> cities;
-    std::vector<RoadModel *> roads;
-
-    CityModel *add_road_first_city = nullptr;
+    CityModel *root = nullptr,
+              *selected = nullptr;
 
     bool solving = false;
+
+public:
+    // bool find(int);
+    bool insert(int);
+    bool remove(int);
+    int height(CityModel *);
+    void preOrder();
+    void inOrder();
+    void postOrder();
+    void balance();
+    void print();
+
+private:
+    void _print(std::ofstream &, CityModel *, CityModel *, int);
+    void _preOrder(CityModel *node = nullptr);
+    void _inOrder(CityModel *node = nullptr);
+    void _postOrder(CityModel *node = nullptr);
+    bool _balance(CityModel *, CityModel *);
+    void _turn_m_on(CityModel *, CityModel *);
+    void _turn_m_op(CityModel *, CityModel *);
+    void _turn_b_on(CityModel *, CityModel *);
+    void _turn_b_op(CityModel *, CityModel *);
 };

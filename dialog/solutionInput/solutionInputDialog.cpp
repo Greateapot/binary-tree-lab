@@ -17,13 +17,12 @@ SolutionInputDialog::~SolutionInputDialog()
 
 void SolutionInputDialog::on_pushButton_cancel_clicked()
 {
-    cancel = true;
     close();
 }
 
 void SolutionInputDialog::on_pushButton_ok_clicked()
 {
-    city_name = ui->lineEdit->text();
+    cancel = false;
     solution_method = ui->comboBox->currentIndex();
     close();
 }

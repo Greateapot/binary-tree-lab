@@ -15,9 +15,8 @@ public:
     explicit SolutionInputDialog(QWidget *parent = nullptr);
     ~SolutionInputDialog();
 
-    QString city_name;
     int solution_method;
-    bool cancel = false;
+    bool cancel = true;
 
 private slots:
     void on_pushButton_ok_clicked();
