@@ -10,7 +10,7 @@
 #include "model/city/cityModel.h"
 #include "widget/scene/scene.h"
 
-const char GDLTR = '\1';
+const char DLTR = '\0';
 const int STATUS_MESSAGE_DELAY = 5000;
 
 namespace Ui
@@ -38,8 +38,8 @@ private slots:
     void unvisitAll();
     void visit(CityModel *);
 
-    // void save();
-    // void load();
+    void save();
+    void load();
 
 private:
     Ui::MainWindow *ui;
@@ -50,6 +50,7 @@ private:
 
     bool solving = false;
 
+    // Работа с деревьями
 public:
     bool insert(int);
     bool remove(int);

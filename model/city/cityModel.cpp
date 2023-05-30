@@ -46,6 +46,14 @@ CityModel::CityModel(const CityModel &city)
     setFlag(QGraphicsItem::ItemIsSelectable);
 }
 
+CityModel::~CityModel()
+{
+    if (tree_left != nullptr)
+        delete tree_left;
+    if (tree_right != nullptr)
+        delete tree_right;
+}
+
 bool operator==(const CityModel &c1, const CityModel &c2)
 {
     return c1.value == c2.value;

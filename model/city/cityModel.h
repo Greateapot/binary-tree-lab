@@ -7,7 +7,6 @@
 #include <QGraphicsItem>
 #include <QPainter>
 
-const char DLTR = '\0';
 
 class CityModel : public QGraphicsItem
 {
@@ -21,6 +20,7 @@ public:
         double radius = 25,
         QGraphicsItem *parent = nullptr);
     CityModel(const CityModel &);
+    ~CityModel();
 
     friend bool operator==(const CityModel &, const CityModel &);
 

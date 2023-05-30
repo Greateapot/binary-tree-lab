@@ -13,9 +13,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(ui->addButton_City, &QPushButton::released, this, &MainWindow::addCity);
     connect(ui->addButton_Road, &QPushButton::released, this, &MainWindow::removeCity);
     connect(ui->solveButton, &QPushButton::released, this, &MainWindow::showSolution);
-    
-    // connect(ui->actionsave, &QAction::triggered, this, &MainWindow::save);
-    // connect(ui->actionload, &QAction::triggered, this, &MainWindow::load);
+
+    connect(ui->actionsave, &QAction::triggered, this, &MainWindow::save);
+    connect(ui->actionload, &QAction::triggered, this, &MainWindow::load);
 }
 
 MainWindow::~MainWindow()
