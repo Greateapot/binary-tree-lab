@@ -51,7 +51,6 @@ private:
     bool solving = false;
 
 public:
-    // bool find(int);
     bool insert(int);
     bool remove(int);
     int height(CityModel *);
@@ -59,10 +58,9 @@ public:
     void inOrder();
     void postOrder();
     void balance();
-    void print();
+    void repair_parents(CityModel *);
 
 private:
-    void _print(std::ofstream &, CityModel *, CityModel *, int);
     void _preOrder(CityModel *node = nullptr);
     void _inOrder(CityModel *node = nullptr);
     void _postOrder(CityModel *node = nullptr);

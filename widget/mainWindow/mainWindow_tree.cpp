@@ -3,20 +3,6 @@
 
 #include <fstream>
 
-// bool MainWindow::find(int value)
-// {
-//     CityModel *cur = root;
-//     while (cur != nullptr)
-//     {
-//         if (value == cur->value)
-//             return true;
-//         else if (value < cur->value)
-//             cur = cur->tree_left;
-//         else
-//             cur = cur->tree_right;
-//     }
-//     return false;
-// }
 
 bool MainWindow::insert(int value)
 {
@@ -73,6 +59,11 @@ bool MainWindow::remove(int value)
         ui->statusbar->showMessage(QString::fromStdString("City " + std::to_string(value) + " doesn't exists!"), STATUS_MESSAGE_DELAY);
         return false;
     }
+    else if (cur == root)
+    {
+        ui->statusbar->showMessage(QString::fromStdString("You can't remove root city!"), STATUS_MESSAGE_DELAY);
+        return false;
+    }
     else if (cur->tree_left == nullptr && cur->tree_right == nullptr)
     {
         (cur->tree_parent->tree_left == cur ? cur->tree_parent->tree_left : cur->tree_parent->tree_right) = nullptr;
@@ -102,6 +93,7 @@ bool MainWindow::remove(int value)
         (cur->tree_parent->tree_left == cur ? cur->tree_parent->tree_left : cur->tree_parent->tree_right) = (cur->tree_left != nullptr ? cur->tree_left : cur->tree_right);
         (cur->tree_left != nullptr ? cur->tree_left : cur->tree_right)->tree_parent = cur->tree_parent;
     }
+
     scene->removeItem(cur);
     scene->QGraphicsScene::update();
     delete cur;
@@ -141,38 +133,23 @@ void MainWindow::balance()
 {
     if (root != nullptr)
         _balance(root, nullptr);
-    int h = height(root);
-    ui->statusbar->showMessage(QString::fromStdString(std::to_string(h)));
-    root->repos(h + 1);
-    scene->QGraphicsScene::update();
-}
-void MainWindow::print()
-{
-    std::ofstream cout("cout.txt");
-    _print(cout, root, nullptr, 0);
-    cout.close();
+    repair_parents(root);
+    root->repos(height(root) + 1);
 }
 
-void MainWindow::_print(std::ofstream &cout, CityModel *left, CityModel *right, int indent)
+void MainWindow::repair_parents(CityModel *r)
 {
-
-    if (left != nullptr)
+    if (r == root)
+        r->tree_parent = nullptr;
+    if (r->tree_left != nullptr)
     {
-        for (int i = 0; i < indent - 1; i++)
-            cout << "│    ";
-        if (indent > 0)
-            cout << "└────L";
-        cout << left->value << '\n';
-        _print(cout, left->tree_left, left->tree_right, indent + 1);
+        r->tree_left->tree_parent = r;
+        repair_parents(r->tree_left);
     }
-    if (right != nullptr)
+    if (r->tree_right != nullptr)
     {
-        for (int i = 0; i < indent - 1; i++)
-            cout << "│    ";
-        if (indent > 0)
-            cout << "└────R";
-        cout << right->value << '\n';
-        _print(cout, right->tree_left, right->tree_right, indent + 1);
+        r->tree_right->tree_parent = r;
+        repair_parents(r->tree_right);
     }
 }
 
